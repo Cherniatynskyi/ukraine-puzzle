@@ -4,13 +4,11 @@ const STATIONS = [
   { id: 1, name: "Символи України", emoji: "🇺🇦", color: "#1565C0" },
   { id: 2, name: "Карта України", emoji: "🗺️", color: "#E65100" },
   { id: 3, name: "Пазл-Карта", emoji: "🧩", color: "#2E7D32" },
-  { id: 4, name: "Природа", emoji: "🌿", color: "#388E3C" },
-  { id: 5, name: "Тварини", emoji: "🦌", color: "#6D4C41" },
-  { id: 6, name: "Страви", emoji: "🥣", color: "#D84315" },
-  { id: 7, name: "Свята", emoji: "🎉", color: "#7B1FA2" },
-  { id: 8, name: "Видатні люди", emoji: "⭐", color: "#1565C0" },
-  { id: 9, name: "Вікторина", emoji: "❓", color: "#00838F" },
-  { id: 10, name: "Фінал!", emoji: "🏆", color: "#F9A825" },
+  { id: 4, name: "Прислів'я", emoji: "📜", color: "#388E3C" },
+  { id: 5, name: "Області", emoji: "🗾", color: "#6D4C41" },
+  { id: 6, name: "Слова", emoji: "🔍", color: "#D84315" },
+  { id: 7, name: "Природа", emoji: "🌲", color: "#2E7D32" },
+  { id: 8, name: "Пісні", emoji: "🎵", color: "#7B1FA2" },
 ];
 
 // Реальні SVG шляхи областей України
@@ -90,7 +88,7 @@ export default function App() {
           <div style={S.progressTrack}>
             <div style={{ ...S.progressFill, width: `${progressPct}%` }} />
           </div>
-          <span style={S.progressLabel}>{completedStations.size} / 10 ✅</span>
+          <span style={S.progressLabel}>{completedStations.size} / 8 ✅</span>
         </div>
       </header>
 
@@ -101,7 +99,7 @@ export default function App() {
               <h2 style={S.cardTitle}>🗺️ Обери станцію!</h2>
               <div style={S.grid}>
                 {STATIONS.map((s) => (
-                  <StationBtn key={s.id} station={s} available={s.id <= 3} done={completedStations.has(s.id)} onClick={() => s.id <= 3 && openStation(s)} />
+                  <StationBtn key={s.id} station={s} available={s.id <= 8} done={completedStations.has(s.id)} onClick={() => s.id <= 8 && openStation(s)} />
                 ))}
               </div>
             </div>
@@ -121,13 +119,18 @@ export default function App() {
                 {currentStation.id === 1 && <Station1 onComplete={() => completeStation(1)} />}
                 {currentStation.id === 2 && <Station2 mapVideoOpen={mapVideoOpen} setMapVideoOpen={setMapVideoOpen} hoveredRegion={hoveredRegion} setHoveredRegion={setHoveredRegion} onComplete={() => completeStation(2)} />}
                 {currentStation.id === 3 && <Station3 puzzleState={puzzleState} setPuzzleState={setPuzzleState} puzzleSolved={puzzleSolved} setPuzzleSolved={setPuzzleSolved} onDragStart={handlePieceDragStart} onDragOver={handleZoneDragOver} onDrop={handleZoneDrop} onComplete={() => completeStation(3)} />}
+                {currentStation.id === 4 && <Station4 onComplete={() => completeStation(4)} />}
+                {currentStation.id === 5 && <Station5 onComplete={() => completeStation(5)} />}
+                {currentStation.id === 6 && <Station6 onComplete={() => completeStation(6)} />}
+                {currentStation.id === 7 && <Station7 onComplete={() => completeStation(7)} />}
+                {currentStation.id === 8 && <Station8 onComplete={() => completeStation(8)} />}
               </div>
             </div>
           )}
         </div>
       </div>
 
-      <TrainTrack completedStations={completedStations} trainPct={trainPct} onStationClick={(s) => s.id <= 3 && openStation(s)} />
+      <TrainTrack completedStations={completedStations} trainPct={trainPct} onStationClick={(s) => s.id <= 8 && openStation(s)} />
       <style>{globalCSS}</style>
     </div>
   );
@@ -324,6 +327,665 @@ function PieceTile({ piece, onDragStart }) {
   );
 }
 
+const PROVERB_CARDS = [
+  { id: 1, emoji: "🌿", symbol: "Верба", proverb: "Без верби і калини — нема України" },
+  { id: 2, emoji: "🌺", symbol: "Калина", proverb: "Калина — краса рідного краю" },
+  { id: 3, emoji: "🌻", symbol: "Соняшник", proverb: "Де сонце світить, там соняшник цвіте" },
+  { id: 4, emoji: "🧵", symbol: "Рушник", proverb: "Рушник — доля, вишита руками матері" },
+  { id: 5, emoji: "👕", symbol: "Вишиванка", proverb: "Вишиванка — то душа народу нашого" },
+  { id: 6, emoji: "🌾", symbol: "Хліб", proverb: "Хліб — усьому голова" },
+  { id: 7, emoji: "🌸", symbol: "Мак", proverb: "Де мак цвіте, там краса живе" },
+  { id: 8, emoji: "🕊️", symbol: "Голуб", proverb: "Голуб — вісник миру і злагоди" },
+  { id: 9, emoji: "🐦", symbol: "Зозуля", proverb: "Зозуля кує — літа лічить" },
+];
+
+function Station4({ onComplete }) {
+  const [flipped, setFlipped] = useState(new Set());
+
+  const toggle = (id) =>
+    setFlipped((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  const allFlipped = flipped.size === PROVERB_CARDS.length;
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      <p style={{ color: "#333", fontWeight: 700, fontSize: "1rem", marginBottom: 18 }}>
+        🃏 Клікни на кожну картку, щоб дізнатися <strong style={{ color: "#388E3C" }}>українське прислів'я</strong> про народний символ!
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
+        {PROVERB_CARDS.map((card) => {
+          const isFlipped = flipped.has(card.id);
+          return (
+            <div key={card.id} onClick={() => toggle(card.id)} style={{ perspective: 600, height: 130, cursor: "pointer" }}>
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  height: "100%",
+                  transformStyle: "preserve-3d",
+                  transition: "transform 0.55s cubic-bezier(.4,0,.2,1)",
+                  transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                }}
+              >
+                {/* Front */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    borderRadius: 18,
+                    background: "linear-gradient(145deg,#1B5E20,#388E3C)",
+                    border: "3px solid rgba(255,255,255,0.6)",
+                    boxShadow: "0 6px 18px rgba(56,142,60,0.35)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    color: "white",
+                    fontWeight: 800,
+                  }}
+                >
+                  <span style={{ fontSize: "2.6rem" }}>{card.emoji}</span>
+                  <span style={{ fontSize: "0.9rem", letterSpacing: "0.02em" }}>{card.symbol}</span>
+                </div>
+                {/* Back */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg)",
+                    borderRadius: 18,
+                    background: "linear-gradient(145deg,#FFF9C4,#FFF176)",
+                    border: "3px solid #F9A825",
+                    boxShadow: "0 6px 18px rgba(249,168,37,0.35)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "10px 12px",
+                    gap: 6,
+                  }}
+                >
+                  <span style={{ fontSize: "1.5rem" }}>{card.emoji}</span>
+                  <span
+                    style={{
+                      fontSize: "0.78rem",
+                      fontWeight: 700,
+                      color: "#4E342E",
+                      lineHeight: 1.4,
+                      textAlign: "center",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    «{card.proverb}»
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {allFlipped && (
+        <div style={{ animation: "popIn .4s ease" }}>
+          <CompleteBtn color="#388E3C" onClick={onComplete} />
+        </div>
+      )}
+      {!allFlipped && (
+        <p style={{ color: "#888", fontSize: "0.85rem", marginTop: 0 }}>
+          Відкрито: {flipped.size} / {PROVERB_CARDS.length}
+        </p>
+      )}
+    </div>
+  );
+}
+
+const REGION_PAIRS = [
+  { id: 1, region: "Вінницька", center: "Вінниця" },
+  { id: 2, region: "Закарпатська", center: "Ужгород" },
+  { id: 3, region: "Київська", center: "Київ" },
+  { id: 4, region: "Одеська", center: "Одеса" },
+  { id: 5, region: "Львівська", center: "Львів" },
+  { id: 6, region: "Харківська", center: "Харків" },
+  { id: 7, region: "Дніпропетровська", center: "Дніпро" },
+  { id: 8, region: "Хмельницька", center: "Хмельницький" },
+];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function Station5({ onComplete }) {
+  const [connections, setConnections] = useState({}); // regionId -> centerId
+  const [draggingId, setDraggingId] = useState(null);
+  const [lines, setLines] = useState([]);
+  const containerRef = useRef(null);
+  const leftRefs = useRef({});
+  const rightRefs = useRef({});
+
+  const [leftItems] = useState(() => shuffle(REGION_PAIRS.map((p) => ({ id: p.id, label: p.region }))));
+  const [rightItems] = useState(() => shuffle(REGION_PAIRS.map((p) => ({ id: p.id, label: p.center }))));
+
+  const isCorrect = (regionId, centerId) => regionId === centerId;
+
+  const calcLines = () => {
+    if (!containerRef.current) return;
+    const box = containerRef.current.getBoundingClientRect();
+    const next = Object.entries(connections)
+      .map(([rId, cId]) => {
+        const lEl = leftRefs.current[rId];
+        const rEl = rightRefs.current[cId];
+        if (!lEl || !rEl) return null;
+        const lr = lEl.getBoundingClientRect();
+        const rr = rEl.getBoundingClientRect();
+        return {
+          x1: lr.right - box.left,
+          y1: lr.top + lr.height / 2 - box.top,
+          x2: rr.left - box.left,
+          y2: rr.top + rr.height / 2 - box.top,
+          correct: isCorrect(Number(rId), Number(cId)),
+        };
+      })
+      .filter(Boolean);
+    setLines(next);
+  };
+
+  useEffect(() => {
+    calcLines();
+    window.addEventListener("resize", calcLines);
+    return () => window.removeEventListener("resize", calcLines);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connections]);
+
+  const handleDrop = (e, centerId) => {
+    e.preventDefault();
+    if (draggingId == null) return;
+    // Remove any previous mapping that used this centerId
+    const cleaned = Object.fromEntries(Object.entries(connections).filter(([, v]) => Number(v) !== centerId));
+    setConnections({ ...cleaned, [draggingId]: centerId });
+    setDraggingId(null);
+  };
+
+  const removeConnection = (regionId) => {
+    const next = { ...connections };
+    delete next[regionId];
+    setConnections(next);
+  };
+
+  const allDone = Object.keys(connections).length === REGION_PAIRS.length;
+  const allCorrectDone = allDone && Object.entries(connections).every(([r, c]) => isCorrect(Number(r), Number(c)));
+
+  const reset = () => {
+    setConnections({});
+    setLines([]);
+  };
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      <p style={{ color: "#333", fontWeight: 700, fontSize: "1rem", marginBottom: 16 }}>
+        🗾 З'єднай <strong style={{ color: "#6D4C41" }}>область</strong> з її <strong style={{ color: "#1565C0" }}>обласним центром</strong>! Перетягни назву.
+      </p>
+
+      <div ref={containerRef} style={{ position: "relative", display: "flex", gap: 0, justifyContent: "space-between", alignItems: "flex-start" }}>
+        {/* SVG lines overlay */}
+        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", overflow: "visible" }}>
+          {lines.map((l, i) => (
+            <g key={i}>
+              <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke={l.correct ? "#4CAF50" : "#EF5350"} strokeWidth="3" strokeDasharray={l.correct ? "none" : "6 4"} strokeLinecap="round" />
+              <circle cx={l.x1} cy={l.y1} r="5" fill={l.correct ? "#4CAF50" : "#EF5350"} />
+              <circle cx={l.x2} cy={l.y2} r="5" fill={l.correct ? "#4CAF50" : "#EF5350"} />
+            </g>
+          ))}
+        </svg>
+
+        {/* Left column — regions */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "44%" }}>
+          <div style={{ fontSize: "0.78rem", color: "#6D4C41", fontWeight: 800, marginBottom: 4, textAlign: "left" }}>🗺️ Область</div>
+          {leftItems.map((item) => {
+            const connected = connections[item.id] != null;
+            const correct = connected && isCorrect(item.id, connections[item.id]);
+            return (
+              <div
+                key={item.id}
+                ref={(el) => {
+                  leftRefs.current[item.id] = el;
+                }}
+                draggable
+                onDragStart={() => setDraggingId(item.id)}
+                onDragEnd={() => setDraggingId(null)}
+                onClick={() => connected && removeConnection(item.id)}
+                style={{
+                  padding: "9px 14px",
+                  borderRadius: 12,
+                  border: connected ? `2.5px solid ${correct ? "#4CAF50" : "#EF5350"}` : "2.5px solid #A1887F",
+                  background: connected ? (correct ? "#E8F5E9" : "#FFEBEE") : "linear-gradient(145deg,#6D4C41,#8D6E63)",
+                  color: connected ? (correct ? "#2E7D32" : "#C62828") : "white",
+                  fontWeight: 800,
+                  fontSize: "0.88rem",
+                  cursor: connected ? "pointer" : "grab",
+                  userSelect: "none",
+                  textAlign: "left",
+                  transition: "all .18s",
+                  boxShadow: connected ? "none" : "0 3px 10px rgba(109,76,65,.35)",
+                  opacity: draggingId === item.id ? 0.45 : 1,
+                  title: connected ? "Клікни, щоб скасувати" : "",
+                }}
+              >
+                {connected ? (correct ? "✅ " : "❌ ") : "⠿ "}
+                {item.label}
+                {connected && <span style={{ fontSize: "0.7rem", marginLeft: 4, opacity: 0.7 }}>(клік — скасувати)</span>}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right column — centers */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "44%" }}>
+          <div style={{ fontSize: "0.78rem", color: "#1565C0", fontWeight: 800, marginBottom: 4, textAlign: "right" }}>🏙️ Обласний центр</div>
+          {rightItems.map((item) => {
+            const isTarget = Object.values(connections).includes(item.id);
+            return (
+              <div
+                key={item.id}
+                ref={(el) => {
+                  rightRefs.current[item.id] = el;
+                }}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => handleDrop(e, item.id)}
+                style={{
+                  padding: "9px 14px",
+                  borderRadius: 12,
+                  border: isTarget ? "2.5px solid #90CAF9" : "2.5px dashed #90CAF9",
+                  background: isTarget ? "#E3F2FD" : "linear-gradient(145deg,#1565C0,#1976D2)",
+                  color: isTarget ? "#0D47A1" : "white",
+                  fontWeight: 800,
+                  fontSize: "0.88rem",
+                  userSelect: "none",
+                  textAlign: "right",
+                  transition: "all .18s",
+                  boxShadow: isTarget ? "none" : "0 3px 10px rgba(21,101,192,.35)",
+                  cursor: "default",
+                }}
+              >
+                {item.label}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+        {allCorrectDone ? (
+          <div style={{ animation: "popIn .4s ease" }}>
+            <div style={{ marginBottom: 10, fontSize: "1.1rem", fontWeight: 800, color: "#2E7D32" }}>🎉 Всі пари правильні!</div>
+            <CompleteBtn color="#6D4C41" onClick={onComplete} />
+          </div>
+        ) : (
+          <p style={{ color: "#888", fontSize: "0.85rem", margin: 0 }}>
+            З'єднано: {Object.keys(connections).length} / {REGION_PAIRS.length}
+            {allDone && !allCorrectDone && <span style={{ color: "#EF5350", marginLeft: 8 }}>— є помилки, виправ!</span>}
+          </p>
+        )}
+        <button onClick={reset} style={{ background: "#f5f5f5", border: "2px solid #ddd", borderRadius: 12, padding: "7px 18px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600, color: "#555", fontFamily: "inherit" }}>
+          🔄 Скинути
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Station7({ onComplete }) {
+  return (
+    <div style={{ textAlign: "center" }}>
+      <p style={{ color: "#333", fontWeight: 700, fontSize: "1rem", marginBottom: 14 }}>
+        🌲 Переглянь відео і дізнайся більше про <strong style={{ color: "#2E7D32" }}>природу України</strong>!
+      </p>
+      <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 24px rgba(46,125,50,0.28)", border: "3px solid #2E7D32", marginBottom: 14 }}>
+        <iframe width="100%" height="300" src="https://www.youtube.com/embed/VQcHguuBM10" title="Природа України" allowFullScreen style={{ display: "block", border: 0 }} />
+      </div>
+      <p style={{ color: "#555", fontWeight: 600, margin: "0 0 16px" }}>📺 Яка гарна природа нашої країни!</p>
+      <CompleteBtn color="#2E7D32" onClick={onComplete} />
+    </div>
+  );
+}
+
+const SONG_TASKS = [
+  {
+    id: 1,
+    song: "Ой у лузі червона калина",
+    emoji: "🌺",
+    lines: ["Ой у лузі червона ___,", "Похилилася..."],
+    answer: "КАЛИНА",
+    hint: "Символ України, червона ягода",
+  },
+  {
+    id: 2,
+    song: "Щедрик",
+    emoji: "🎶",
+    lines: ["Щедрик, щедрик, ___,", "Прилетіла ластівочка..."],
+    answer: "ЩЕДРІВОЧКА",
+    hint: "Маленька щедра пісенька",
+  },
+  {
+    id: 3,
+    song: "Два кольори",
+    emoji: "🎨",
+    lines: ["Два кольори мої, два ___,", "Оба на полотні..."],
+    answer: "КОЛЬОРИ",
+    hint: "Перше слово пісні повторюється двічі",
+  },
+  {
+    id: 4,
+    song: "Зозуля",
+    emoji: "🐦",
+    lines: ["Зозуле, зозуле,", "Скільки мені ___?"],
+    answer: "ЖИТИ",
+    hint: "Питання про довжину життя",
+  },
+];
+
+function Station8({ onComplete }) {
+  const [answers, setAnswers] = useState({});
+  const [checked, setChecked] = useState({});
+  const [showHint, setShowHint] = useState({});
+
+  const handleCheck = (id, answer) => {
+    const task = SONG_TASKS.find((t) => t.id === id);
+    const correct = answer.trim().toUpperCase() === task.answer;
+    setChecked((prev) => ({ ...prev, [id]: correct ? "correct" : "wrong" }));
+    if (!correct) setTimeout(() => setChecked((prev) => ({ ...prev, [id]: null })), 1200);
+  };
+
+  const solvedCount = SONG_TASKS.filter((t) => checked[t.id] === "correct").length;
+  const allSolved = solvedCount === SONG_TASKS.length;
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      <p style={{ color: "#333", fontWeight: 700, fontSize: "1rem", marginBottom: 16 }}>
+        🎵 Вгадай пропущене слово в українській <strong style={{ color: "#7B1FA2" }}>народній пісні</strong>!
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14, marginBottom: 16 }}>
+        {SONG_TASKS.map((task) => {
+          const status = checked[task.id];
+          const solved = status === "correct";
+          const wrong = status === "wrong";
+          return (
+            <div
+              key={task.id}
+              style={{
+                borderRadius: 16,
+                border: `3px solid ${solved ? "#4CAF50" : wrong ? "#EF5350" : "#CE93D8"}`,
+                background: solved ? "#E8F5E9" : wrong ? "#FFEBEE" : "linear-gradient(145deg,#F3E5F5,#EDE7F6)",
+                padding: "14px 12px",
+                transition: "all .2s",
+                animation: wrong ? "shake .4s ease" : "none",
+              }}
+            >
+              <div style={{ fontSize: "1.6rem", marginBottom: 4 }}>{task.emoji}</div>
+              <div style={{ fontSize: "0.78rem", fontWeight: 900, color: "#7B1FA2", marginBottom: 6 }}>{task.song}</div>
+              <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#333", lineHeight: 1.5, marginBottom: 10, fontStyle: "italic" }}>
+                {task.lines.map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
+              </div>
+              {solved ? (
+                <div style={{ fontWeight: 900, color: "#2E7D32", fontSize: "0.95rem" }}>✅ {task.answer}</div>
+              ) : (
+                <div style={{ display: "flex", gap: 6, justifyContent: "center", alignItems: "center" }}>
+                  <input
+                    value={answers[task.id] ?? ""}
+                    onChange={(e) => setAnswers((prev) => ({ ...prev, [task.id]: e.target.value }))}
+                    onKeyDown={(e) => e.key === "Enter" && handleCheck(task.id, answers[task.id] ?? "")}
+                    placeholder="твоя відповідь..."
+                    style={{
+                      border: `2px solid ${wrong ? "#EF5350" : "#CE93D8"}`,
+                      borderRadius: 10,
+                      padding: "6px 10px",
+                      fontSize: "0.85rem",
+                      fontWeight: 700,
+                      fontFamily: "inherit",
+                      width: "100%",
+                      outline: "none",
+                      background: "white",
+                    }}
+                  />
+                  <button
+                    onClick={() => handleCheck(task.id, answers[task.id] ?? "")}
+                    style={{
+                      background: "#7B1FA2",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 10,
+                      padding: "6px 12px",
+                      cursor: "pointer",
+                      fontWeight: 800,
+                      fontSize: "0.85rem",
+                      fontFamily: "inherit",
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✓
+                  </button>
+                </div>
+              )}
+              <button onClick={() => setShowHint((prev) => ({ ...prev, [task.id]: !prev[task.id] }))} style={{ marginTop: 6, background: "none", border: "none", color: "#9C27B0", fontSize: "0.72rem", cursor: "pointer", fontFamily: "inherit" }}>
+                {showHint[task.id] ? "▲ сховати" : "💡 підказка"}
+              </button>
+              {showHint[task.id] && <div style={{ marginTop: 4, fontSize: "0.75rem", color: "#6A1B9A", fontStyle: "italic" }}>{task.hint}</div>}
+            </div>
+          );
+        })}
+      </div>
+      <p style={{ color: "#888", fontSize: "0.85rem", margin: "0 0 12px" }}>
+        Відгадано: {solvedCount} / {SONG_TASKS.length}
+      </p>
+      {allSolved && (
+        <div style={{ animation: "popIn .4s ease" }}>
+          <div style={{ marginBottom: 10, fontSize: "1.1rem", fontWeight: 800, color: "#7B1FA2" }}>🎉 Всі пісні відгадані!</div>
+          <CompleteBtn color="#7B1FA2" onClick={onComplete} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+const GRID_SIZE = 12;
+const UA_LETTERS = "АБВГДЕЄЖЗИІЇКЛМНОПРСТУФХЦЧШЩЬЮЯ";
+const FOUND_COLORS = ["#4CAF50", "#2196F3", "#FF9800", "#9C27B0", "#F44336", "#00BCD4", "#8BC34A", "#FF5722", "#3F51B5"];
+
+const WORDS_TO_FIND = [
+  { word: "ТРИЗУБ", row: 0, col: 1, dir: "H" },
+  { word: "ПРАПОР", row: 2, col: 4, dir: "H" },
+  { word: "ГЕРБ", row: 3, col: 0, dir: "V" },
+  { word: "ГІМН", row: 5, col: 6, dir: "D" },
+  { word: "КАЛИНА", row: 1, col: 11, dir: "V" },
+  { word: "ВЕРБА", row: 7, col: 2, dir: "H" },
+  { word: "ВИШИВАНКА", row: 9, col: 0, dir: "H" },
+  { word: "ХЛІБ", row: 4, col: 10, dir: "V" },
+  { word: "СОНЯШНИК", row: 1, col: 1, dir: "V" },
+];
+
+function buildWordGrid() {
+  const grid = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(""));
+  WORDS_TO_FIND.forEach(({ word, row, col, dir }) => {
+    for (let i = 0; i < word.length; i++) {
+      const r = row + (dir !== "H" ? i : 0);
+      const c = col + (dir !== "V" ? i : 0);
+      grid[r][c] = word[i];
+    }
+  });
+  for (let r = 0; r < GRID_SIZE; r++) for (let c = 0; c < GRID_SIZE; c++) if (!grid[r][c]) grid[r][c] = UA_LETTERS[Math.floor(Math.random() * UA_LETTERS.length)];
+  return grid;
+}
+
+function getLineCells(start, end) {
+  if (!start) return [];
+  if (!end || (start.row === end.row && start.col === end.col)) return [start];
+  const dr = end.row - start.row;
+  const dc = end.col - start.col;
+  if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) return [start];
+  const steps = Math.max(Math.abs(dr), Math.abs(dc));
+  const sr = Math.sign(dr),
+    sc = Math.sign(dc);
+  return Array.from({ length: steps + 1 }, (_, i) => ({ row: start.row + i * sr, col: start.col + i * sc }));
+}
+
+function Station6({ onComplete }) {
+  const [grid] = useState(buildWordGrid);
+  const [sel, setSel] = useState({ start: null, end: null, active: false });
+  const [foundWords, setFoundWords] = useState([]);
+  const [shake, setShake] = useState(false);
+
+  const selectedCells = getLineCells(sel.start, sel.end);
+  const cellKey = (r, c) => `${r}-${c}`;
+
+  const foundCellMap = {};
+  foundWords.forEach(({ cells, color }) =>
+    cells.forEach(({ row, col }) => {
+      foundCellMap[cellKey(row, col)] = color;
+    }),
+  );
+
+  const checkWord = (cells) => {
+    if (cells.length < 2) return false;
+    const str = cells.map(({ row, col }) => grid[row][col]).join("");
+    const rev = str.split("").reverse().join("");
+    const hit = WORDS_TO_FIND.find(({ word }) => !foundWords.find((fw) => fw.word === word) && (word === str || word === rev));
+    if (hit) {
+      setFoundWords((prev) => [...prev, { word: hit.word, cells, color: FOUND_COLORS[prev.length % FOUND_COLORS.length] }]);
+      return true;
+    }
+    return false;
+  };
+
+  const handleMouseDown = (r, c, e) => {
+    e.preventDefault();
+    setSel({ start: { row: r, col: c }, end: { row: r, col: c }, active: true });
+  };
+  const handleMouseEnter = (r, c) => {
+    if (!sel.active) return;
+    setSel((prev) => ({ ...prev, end: { row: r, col: c } }));
+  };
+  const handleMouseUp = () => {
+    if (!sel.active) return;
+    const cells = getLineCells(sel.start, sel.end);
+    if (!checkWord(cells)) {
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
+    }
+    setSel({ start: null, end: null, active: false });
+  };
+
+  const allFound = foundWords.length === WORDS_TO_FIND.length;
+
+  return (
+    <div style={{ textAlign: "center" }} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+      <p style={{ color: "#333", fontWeight: 700, fontSize: "1rem", marginBottom: 14 }}>
+        🔍 Знайди всі <strong style={{ color: "#D84315" }}>9 слів</strong> — державні символи України! Виділи букви мишкою.
+      </p>
+      <div style={{ display: "flex", gap: 16, justifyContent: "center", alignItems: "flex-start", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "inline-grid",
+            gridTemplateColumns: `repeat(${GRID_SIZE}, 34px)`,
+            gap: 2,
+            background: "#E3F2FD",
+            padding: 8,
+            borderRadius: 14,
+            border: "2px solid #90CAF9",
+            userSelect: "none",
+            animation: shake ? "shake .4s ease" : "none",
+          }}
+        >
+          {grid.map((row, r) =>
+            row.map((letter, c) => {
+              const key = cellKey(r, c);
+              const foundColor = foundCellMap[key];
+              const selected = selectedCells.some((sc) => sc.row === r && sc.col === c);
+              return (
+                <div
+                  key={key}
+                  onMouseDown={(e) => handleMouseDown(r, c, e)}
+                  onMouseEnter={() => handleMouseEnter(r, c)}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 8,
+                    fontSize: "0.82rem",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    transition: "background .1s, transform .1s",
+                    background: foundColor ?? (selected ? "#FF9800" : "white"),
+                    color: foundColor || selected ? "white" : "#1a1a1a",
+                    boxShadow: selected ? "0 2px 8px rgba(255,152,0,.5)" : "0 1px 3px rgba(0,0,0,.1)",
+                    transform: selected ? "scale(1.12)" : "scale(1)",
+                  }}
+                >
+                  {letter}
+                </div>
+              );
+            }),
+          )}
+        </div>
+
+        <div style={{ minWidth: 160 }}>
+          <div style={{ fontSize: "0.8rem", fontWeight: 800, color: "#555", marginBottom: 8 }}>📋 Слова для пошуку:</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {WORDS_TO_FIND.map(({ word }) => {
+              const found = foundWords.find((fw) => fw.word === word);
+              return (
+                <div
+                  key={word}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: 10,
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    background: found ? found.color : "#f5f5f5",
+                    color: found ? "white" : "#555",
+                    border: found ? "none" : "2px dashed #ddd",
+                    textDecoration: found ? "line-through" : "none",
+                    transition: "all .3s",
+                    textAlign: "left",
+                  }}
+                >
+                  {found ? "✅ " : "○ "}
+                  {word}
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 10, fontSize: "0.8rem", color: "#888" }}>
+            Знайдено: {foundWords.length} / {WORDS_TO_FIND.length}
+          </div>
+        </div>
+      </div>
+
+      {allFound && (
+        <div style={{ marginTop: 16, animation: "popIn .4s ease" }}>
+          <div style={{ marginBottom: 10, fontSize: "1.1rem", fontWeight: 800, color: "#D84315" }}>🎉 Всі слова знайдено!</div>
+          <CompleteBtn color="#D84315" onClick={onComplete} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Wagon({ color }) {
   return (
     <div style={{ width: 42, height: 26, background: color, borderRadius: "4px 4px 0 0", border: "2px solid rgba(255,255,255,0.55)", boxShadow: "0 2px 6px rgba(0,0,0,.28)", position: "relative", flexShrink: 0 }}>
@@ -375,7 +1037,7 @@ function TrainTrack({ completedStations, trainPct, onStationClick }) {
       <div style={{ position: "absolute", bottom: 30, left: `${trainPct}%`, transition: "left 1.1s cubic-bezier(.25,.46,.45,.94)", fontSize: "3.2rem", lineHeight: 1, filter: "drop-shadow(0 4px 12px rgba(0,0,0,.35))", transform: "translateX(-50%) scaleX(-1)", zIndex: 22, pointerEvents: "none" }}>🚂</div>
       {STATIONS.map((s) => {
         const pct = stationPct(s.id);
-        const avail = s.id <= 3;
+        const avail = s.id <= 8;
         const done = completedStations.has(s.id);
         return (
           <div key={s.id} onClick={() => onStationClick(s)} style={{ position: "absolute", bottom: 80, left: `${pct}%`, transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", cursor: avail ? "pointer" : "default", zIndex: 35 }}>
@@ -423,6 +1085,7 @@ const globalCSS = `
   @keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
   @keyframes popIn{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
   ::-webkit-scrollbar{width:6px}
   ::-webkit-scrollbar-track{background:#f0f0f0;border-radius:10px}
   ::-webkit-scrollbar-thumb{background:#90CAF9;border-radius:10px}
