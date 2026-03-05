@@ -653,7 +653,7 @@ function Station7({ onComplete }) {
         🌲 Переглянь відео і дізнайся більше про <strong style={{ color: "#2E7D32" }}>природу України</strong>!
       </p>
       <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 24px rgba(46,125,50,0.28)", border: "3px solid #2E7D32", marginBottom: 14 }}>
-        <iframe width="100%" height="300" src="https://www.youtube.com/embed/VQcHguuBM10" title="Природа України" allowFullScreen style={{ display: "block", border: 0 }} />
+        <iframe width="100%" height="300" src="https://www.youtube.com/embed/xrwBUIyq0WU" title="Природа України" allowFullScreen style={{ display: "block", border: 0 }} />
       </div>
       <p style={{ color: "#555", fontWeight: 600, margin: "0 0 16px" }}>📺 Яка гарна природа нашої країни!</p>
       <CompleteBtn color="#2E7D32" onClick={onComplete} />
